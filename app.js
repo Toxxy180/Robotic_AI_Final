@@ -28,6 +28,16 @@
     chip:'M6 6h12v12H6V6Zm3 3h6v6H9V9ZM9 2v4m6-4v4m-6 12v4m6-4v4M2 9h4m-4 6h4m12-6h4m-4 6h4',
   };
   const icon = (name) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${paths[name] || paths.book}"/></svg>`;
+  const lectureList = window.COURSE_LECTURES || [];
+  const lectureURL = (lecture, start = 0) => `https://www.youtube.com/watch?v=${encodeURIComponent(lecture.id)}${start ? `&t=${start}s` : ''}`;
+  const coverageLabels = {direct:'คลิปอธิบายโดยตรง',partial:'คลิปครอบคลุมบางส่วน',uncovered:'ยังไม่ครอบคลุมในคลิปชุดนี้',extension:'แนวคิดต่อยอดจากบทเรียน'};
+  function renderLectureEvidence(q) {
+    if(!q.lecture)return '';
+    const refs = q.lecture.refs.map(ref => ({...ref,lecture:lectureList.find(lecture => lecture.week===ref.week)})).filter(ref=>ref.lecture);
+    const weeks = [...new Set(refs.map(ref=>ref.week))].map(week=>`Week ${week}`).join(', ');
+    return `<details class="lecture-evidence" data-coverage="${q.lecture.status}"><summary>${icon('chevron')}<span>${weeks ? `วิดีโอประกอบ · ${weeks}` : 'ขอบเขตคลิปประกอบคำตอบ'}</span></summary><div class="lecture-evidence-body"><strong>${coverageLabels[q.lecture.status]}</strong><p>${escapeHTML(q.lecture.note)}</p>${refs.length ? `<ul>${refs.map(ref=>`<li><a href="${escapeHTML(lectureURL(ref.lecture,ref.start))}" target="_blank" rel="noopener noreferrer">Week ${ref.week} · ${escapeHTML(ref.range)} — ${escapeHTML(ref.lecture.title)}</a></li>`).join('')}</ul>` : ''}</div></details>`;
+  }
+  $('#lecture-summaries').innerHTML = lectureList.map(lecture=>`<section class="lecture-summary" aria-labelledby="lecture-title-${lecture.week}"><div class="lecture-week">Week ${lecture.week}<span>${escapeHTML(lecture.duration)} นาที</span></div><div><h3 id="lecture-title-${lecture.week}"><a href="${escapeHTML(lectureURL(lecture))}" target="_blank" rel="noopener noreferrer">${escapeHTML(lecture.title)} ${icon('arrow')}</a></h3><p>${escapeHTML(lecture.summary)}</p><div class="lecture-chapters">${lecture.chapters.map(chapter=>`<a href="${escapeHTML(lectureURL(lecture,chapter.time))}" target="_blank" rel="noopener noreferrer">${escapeHTML(chapter.label)}</a>`).join('')}</div></div></section>`).join('');
   function fillIcons(root = document) { $$('[data-icon]', root).forEach(el => el.innerHTML = icon(el.dataset.icon)); }
   const categories = [
     ['all','ทั้งหมด 25 ข้อ','book'],['foundations','พื้นฐานหุ่นยนต์','robot'],['industry','อุตสาหกรรม','factory'],['health','การแพทย์','health'],['agriculture','เกษตรอัจฉริยะ','leaf'],['learning','การเรียนรู้','school'],['mobility','ยานยนต์','car'],['ethics','จริยธรรม','scale'],['future','อนาคต','globe']
@@ -43,9 +53,10 @@
       <div class="text-block question-block"><span class="block-label">โจทย์</span><p>${escapeHTML(q.question)}</p></div>
       <div class="text-block answer-block"><span class="block-label">คำตอบ</span><div>${q.answer.map(line => `<p>${escapeHTML(line)}</p>`).join('')}</div></div>
       <div class="question-actions"><button class="button button-outline copy-button" data-id="${q.id}">${icon('copy')}<span>คัดลอกคำตอบ</span></button><button class="button read-button" data-id="${q.id}" aria-pressed="false">${icon('circle')}<span>อ่านแล้ว</span></button></div>
+      ${renderLectureEvidence(q)}
       ${q.sources?.length ? `<details class="sources"><summary>${icon('chevron')} แหล่งอ้างอิง ${q.sources.length} แห่ง</summary><ul>${q.sources.map(s => `<li><a href="${escapeHTML(s.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(s.title)}</a></li>`).join('')}</ul></details>` : ''}
     </div>${q.visual ? `<div class="question-visual"><div class="visual-mount" data-visual="${q.visual}" role="group" aria-label="${visuals[q.visual]}"><div class="visual-loading"><span class="loading-orbit"></span></div></div><p class="visual-note">${q.visual==='learning'?'เลือกแท็บเพื่อเปรียบเทียบวิธีเรียนรู้แต่ละประเภท':'ลากเพื่อหมุน · ภาพจำลองเพื่อการเรียนรู้ ไม่ใช่อุปกรณ์จริงตามสัดส่วน'}</p></div>` : ''}</div>
-    ${q.id === 3 ? `<div class="timeline" aria-label="เส้นเวลาหุ่นยนต์"><div class="timeline-stop"><strong>1961</strong><span>Unimate · โรงงาน</span></div><div class="timeline-stop"><strong>1966–1972</strong><span>Shakey · วางแผน</span></div><div class="timeline-stop"><strong>1997</strong><span>Sojourner · ดาวอังคาร</span></div><div class="timeline-stop"><strong>2000</strong><span>ASIMO · เดินสองขา</span></div></div>` : ''}
+    ${q.timeline?.length ? `<div class="timeline" aria-label="เส้นเวลาหุ่นยนต์">${q.timeline.map(event=>`<div class="timeline-stop"><strong>${escapeHTML(event.year)}</strong><span>${escapeHTML(event.label)}</span></div>`).join('')}</div>` : ''}
   </article>`).join('');
   fillIcons();
   function toast(message) { const el = $('#toast'); el.textContent = message; el.classList.add('show'); clearTimeout(toast.timer); toast.timer = setTimeout(() => el.classList.remove('show'),2400); }
@@ -68,6 +79,7 @@
     let matches = 0;
     data.forEach(q => { const text = `${q.id} ${q.title} ${q.question} ${q.answer.join(' ')} ${q.keywords}`.toLocaleLowerCase('th'); const show = (category === 'all' || q.category === category) && (!query || text.includes(query)); $(`#q${q.id}`).hidden = !show; if(show) matches++; });
     $('#hero').hidden = category !== 'all' || !!query;
+    $('#lecture-guide').hidden = category !== 'all' || !!query;
     $('#section-title').textContent = query ? 'ผลการค้นหา' : category === 'all' ? 'บทเรียนทั้งหมด' : categories.find(c=>c[0] === category)[1];
     $('#filter-summary').hidden = !query;
     $('#filter-summary').textContent = query ? `คำค้น “${$('#search').value.trim()}”${category !== 'all' ? ` · ${categories.find(c=>c[0] === category)[1]}` : ''}` : '';
