@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#00875b">
+  <meta name="description" content="ทบทวน Robotics & AI ด้วยโจทย์เต็ม 25 ข้อ คำตอบกระชับ และโมเดล 3D ที่หมุนดูได้ ครอบคลุมหุ่นยนต์ อุตสาหกรรม การแพทย์ เกษตร และจริยธรรม">
+  <title>Robotics & AI — สมุดทบทวน 3D</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preload" href="assets/NotoSansThai.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script src="content.js" defer></script>
+  <script src="app.js" defer></script>
+  <script type="module" src="visuals.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#lessons">ข้ามไปยังบทเรียน</a>
+  <div id="nav-backdrop" class="nav-backdrop" hidden></div>
+  <aside class="sidebar" id="sidebar" aria-label="สารบัญบทเรียน">
+    <a class="brand" href="#" aria-label="Robotics & AI หน้าแรก">
+      <svg class="brand-cube" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3 58 17 32 31 6 17Z" fill="#45c58a"/><path d="M6 21 29 34V61L6 47Z" fill="#009568"/><path d="M35 34 58 21V47L35 61Z" fill="#004f3b"/><path d="M32 31V61M6 17 32 31 58 17" fill="none" stroke="white" stroke-width="2"/></svg>
+      <span><strong>R / AI</strong><small>สมุดทบทวน</small></span>
+    </a>
+    <button class="close-nav icon-button" aria-label="ปิดสารบัญ" data-icon="close"></button>
+    <div class="search-wrap"><span data-icon="search"></span><input id="search" type="search" placeholder="ค้นหาโจทย์หรือคำสำคัญ" aria-label="ค้นหาโจทย์หรือคำสำคัญ" autocomplete="off"></div>
+    <nav class="category-nav" id="categories" aria-label="หมวดหมู่คำถาม"></nav>
+    <div class="study-progress"><div class="progress-label">ความคืบหน้าในการอ่าน<button id="reset-progress" title="ล้างสถานะอ่านแล้ว" aria-label="ล้างสถานะอ่านแล้ว" data-icon="reset"></button></div><div class="progress-number"><strong id="read-count">0</strong><span>/ 25 ข้อ</span></div><div class="progress-track" role="progressbar" aria-label="ความคืบหน้าในการอ่าน" aria-valuemin="0" aria-valuemax="25" aria-valuenow="0"><span id="progress-fill"></span></div><p>บันทึกไว้ในเบราว์เซอร์นี้</p></div>
+  </aside>
+  <div class="app-main">
+    <header class="topbar"><div class="topbar-left"><button class="menu-button icon-button" aria-label="เปิดสารบัญ" aria-controls="sidebar" aria-expanded="false" data-icon="menu"></button><a href="#" class="topbar-title">Robotics & AI</a></div><button id="print" class="button button-outline"><span data-icon="print"></span><span>พิมพ์ / บันทึก PDF</span></button></header>
+    <main>
+      <section class="hero" id="hero" aria-labelledby="hero-title">
+        <div class="hero-copy"><h1 id="hero-title">เข้าใจ<span>หุ่นยนต์</span><br>และ <span>AI</span> ให้เห็นภาพ</h1><p>โจทย์เต็ม 25 ข้อ · คำตอบกระชับ · ภาพจำลอง 3D</p><a class="button button-primary" href="#lessons">เริ่มทบทวน <span data-icon="arrow"></span></a></div>
+        <div class="hero-visual" id="hero-visual" data-visual="robot" aria-label="โมเดลสามมิติหุ่นยนต์สีขาว สามารถลากเพื่อหมุนได้"><div class="visual-loading"><span class="loading-orbit"></span></div></div>
+      </section>
+      <section class="lesson-section" id="lessons" aria-labelledby="section-title">
+        <div class="section-heading"><div><h2 id="section-title">บทเรียนทั้งหมด</h2><p id="filter-summary" hidden></p></div><span id="result-count">01 — 25</span></div>
+        <div id="question-list"></div>
+        <div id="empty-state" hidden><span data-icon="search"></span><h3>ยังไม่พบคำถามที่ตรงกัน</h3><p>ลองใช้คำสั้น ๆ เช่น “หุ่นยนต์” “SAE” หรือ “จริยธรรม”</p><button class="button button-primary" id="clear-search">แสดงคำถามทั้งหมด</button></div>
+        <footer class="page-footer"><strong>Robotics & AI</strong><span>ครบ 25 โจทย์ · เรียนรู้ทีละข้อ เข้าใจทีละเรื่อง</span><a href="#hero">กลับด้านบน <span data-icon="up"></span></a></footer>
+      </section>
+    </main>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
